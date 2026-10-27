@@ -1,0 +1,228 @@
+@model HouseRentalManagementSystem.ViewModels.Dashboard.TenantDashboardViewModel
+@{
+    ViewData["Title"] = "Tenant Dashboard - My Applications";
+}
+
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 small">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Tenant Dashboard</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold mb-0">My Rental Applications</h2>
+            <p class="text-muted small mb-0">Track application statuses, view landlord responses, and manage submissions</p>
+        </div>
+
+        <a asp-controller="Properties" asp-action="Index" class="btn btn-primary">
+            <i class="bi bi-search me-1"></i> Browse More Houses
+        </a>
+    </div>
+
+    <!-- Metric Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-lg-3 col-6">
+            <div class="metric-card">
+                <div>
+                    <div class="text-muted small">Total Applied</div>
+                    <div class="fs-3 fw-bold text-dark">@Model.TotalApplications</div>
+                </div>
+                <div class="metric-icon-circle metric-icon-blue">
+                    <i class="bi bi-file-earmark-text"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="metric-card">
+                <div>
+                    <div class="text-muted small">Pending Review</div>
+                    <div class="fs-3 fw-bold text-amber">@Model.PendingApplications</div>
+                </div>
+                <div class="metric-icon-circle metric-icon-amber">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="metric-card">
+                <div>
+                    <div class="text-muted small">Approved</div>
+                    <div class="fs-3 fw-bold text-success">@Model.ApprovedApplications</div>
+                </div>
+                <div class="metric-icon-circle metric-icon-green">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="metric-card">
+                <div>
+                    <div class="text-muted small">Rejected / Cancelled</div>
+                    <div class="fs-3 fw-bold text-secondary">@Model.RejectedApplications</div>
+                </div>
+                <div class="metric-icon-circle metric-icon-sand">
+                    <i class="bi bi-x-circle"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Applications List -->
+    @if (Model.MyApplications != null && Model.MyApplications.Count > 0)
+    {
+        <div class="custom-table table-responsive mb-5">
+            <table class="table mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th style="min-width: 260px;">Property</th>
+                        <th>Monthly Rent</th>
+                        <th>Applied On</th>
+                        <th>Move-in Date</th>
+                        <th>Application Status</th>
+                        <th>Landlord Remarks</th>
+                        <th class="text-end" style="min-width: 130px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var app in Model.MyApplications)
+                    {
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <img src="@(app.Property?.ImageUrl ?? "/images/properties/default-house.jpg")" alt="@app.Property?.Title" class="rounded-3 object-fit-cover border" style="width: 60px; height: 48px;" 
+                                         onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1000&q=80';" />
+                                    <div>
+                                        <div class="fw-bold text-dark text-truncate" style="max-width: 220px;">
+                                            <a asp-controller="Properties" asp-action="Details" asp-route-id="@app.PropertyId" class="text-decoration-none text-dark hover-primary">
+                                                @(app.Property?.Title ?? "Property Details")
+                                            </a>
+                                        </div>
+                                        <div class="small text-muted">@app.Property?.City &bull; Landlord: @app.Property?.Owner?.FullName</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="fw-bold text-primary">$@(app.Property?.MonthlyRent.ToString("N0") ?? "0")</span>
+                                <div class="small text-muted">Deposit: $@(app.Property?.SecurityDeposit.ToString("N0") ?? "0")</div>
+                            </td>
+                            <td>
+                                <div class="small text-dark">@app.AppliedAt.ToString("MMM dd, yyyy")</div>
+                                <div class="text-muted" style="font-size: 0.75rem;">@app.AppliedAt.ToString("hh:mm tt")</div>
+                            </td>
+                            <td>
+                                <span class="small fw-semibold text-secondary">@app.ProposedMoveInDate.ToString("MMM dd, yyyy")</span>
+                            </td>
+                            <td>
+                                @if (app.Status == ApplicationStatus.Pending)
+                                {
+                                    <span class="status-badge status-badge-pending">
+                                        <i class="bi bi-clock"></i> Pending
+                                    </span>
+                                }
+                                else if (app.Status == ApplicationStatus.Approved)
+                                {
+                                    <span class="status-badge status-badge-approved">
+                                        <i class="bi bi-check2-circle"></i> Approved
+                                    </span>
+                                }
+                                else if (app.Status == ApplicationStatus.Rejected)
+                                {
+                                    <span class="status-badge status-badge-rejected">
+                                        <i class="bi bi-x-circle"></i> Rejected
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="status-badge status-badge-cancelled">
+                                        <i class="bi bi-slash-circle"></i> Cancelled
+                                    </span>
+                                }
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(app.ReviewerRemarks))
+                                {
+                                    <span class="small text-secondary fst-italic">"@app.ReviewerRemarks"</span>
+                                }
+                                else
+                                {
+                                    <span class="small text-muted">&mdash;</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-1">
+                                    <a asp-action="Details" asp-route-id="@app.Id" class="btn btn-sm btn-outline-primary" title="View Full Details">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+
+                                    @if (app.Status == ApplicationStatus.Pending)
+                                    {
+                                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelModal_@app.Id" title="Cancel Application">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+
+                                        <!-- Cancel Confirmation Modal -->
+                                        <div class="modal fade text-start" id="cancelModal_@app.Id" tabindex="-1" aria-labelledby="cancelModalLabel_@app.Id" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content border-0 shadow">
+                                                    <div class="modal-header border-0 pb-0">
+                                                        <h5 class="modal-title fw-bold text-dark" id="cancelModalLabel_@app.Id">
+                                                            Cancel Rental Application
+                                                        </h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body py-3">
+                                                        Are you sure you want to cancel your application for <strong>@(app.Property?.Title ?? "this property")</strong>?
+                                                    </div>
+                                                    <div class="modal-footer border-0 pt-0">
+                                                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Keep Application</button>
+                                                        <form asp-action="Cancel" asp-route-id="@app.Id" method="post" class="d-inline">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-danger">Confirm Cancellation</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="bg-white p-5 rounded-4 shadow-sm border text-center my-4">
+            <div class="rounded-circle bg-light text-muted mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+                <i class="bi bi-file-earmark-plus fs-2 text-primary"></i>
+            </div>
+            <h4 class="fw-bold text-dark">No Applications Submitted</h4>
+            <p class="text-secondary small mb-3">You haven't submitted any rental applications yet. Explore our listings to find your ideal home.</p>
+            <a asp-controller="Properties" asp-action="Index" class="btn btn-primary fw-bold">
+                <i class="bi bi-search me-1"></i> Browse Available Houses
+            </a>
+        </div>
+    }
+
+    <!-- Recommended Properties -->
+    @if (Model.RecommendedProperties != null && Model.RecommendedProperties.Count > 0)
+    {
+        <div class="mt-5 pt-3">
+            <h4 class="fw-bold mb-3">Recommended For You</h4>
+            <div class="row g-4">
+                @foreach (var property in Model.RecommendedProperties)
+                {
+                    <div class="col-lg-4 col-md-6">
+                        @await Html.PartialAsync("_PropertyCard", property)
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+

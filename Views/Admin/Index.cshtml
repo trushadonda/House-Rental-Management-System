@@ -1,0 +1,252 @@
+@model HouseRentalManagementSystem.ViewModels.Dashboard.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Control Dashboard";
+}
+
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 small">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Admin Control Center</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold mb-0">System Overview &amp; Analytics</h2>
+            <p class="text-muted small mb-0">Platform administrative control, user moderation, and rental oversight</p>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a asp-action="Properties" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-houses me-1"></i> Properties
+            </a>
+            <a asp-action="Users" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-people me-1"></i> Users
+            </a>
+            <a asp-action="Applications" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-file-earmark-text me-1"></i> Applications
+            </a>
+        </div>
+    </div>
+
+    <!-- KPI Metric Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="metric-card">
+                <div>
+                    <div class="text-muted small">Total Users</div>
+                    <div class="fs-3 fw-bold text-dark">@Model.TotalUsers</div>
+                    <div class="small text-secondary" style="font-size: 0.75rem;">
+                        <span class="text-primary fw-bold">@Model.TotalOwners</span> Owners &bull; <span class="text-success fw-bold">@Model.TotalTenants</span> Tenants
+                    </div>
+                </div>
+                <div class="metric-icon-circle metric-icon-blue">
+                    <i class="bi bi-people"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="metric-card">
+                <div>
+                    <div class="text-muted small">Properties Listed</div>
+                    <div class="fs-3 fw-bold text-dark">@Model.TotalProperties</div>
+                    <div class="small text-secondary" style="font-size: 0.75rem;">
+                        <span class="text-success fw-bold">@Model.AvailableProperties</span> Available &bull; <span class="text-danger fw-bold">@Model.InactiveProperties</span> Inactive
+                    </div>
+                </div>
+                <div class="metric-icon-circle metric-icon-green">
+                    <i class="bi bi-building-check"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="metric-card">
+                <div>
+                    <div class="text-muted small">Pending Applications</div>
+                    <div class="fs-3 fw-bold text-amber">@Model.PendingApplications</div>
+                    <div class="small text-secondary" style="font-size: 0.75rem;">
+                        Out of @Model.TotalApplications Total
+                    </div>
+                </div>
+                <div class="metric-icon-circle metric-icon-amber">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="metric-card">
+                <div>
+                    <div class="text-muted small">Approved Applications</div>
+                    <div class="fs-3 fw-bold text-success">@Model.ApprovedApplications</div>
+                    <div class="small text-muted" style="font-size: 0.75rem;">
+                        Successful Placements
+                    </div>
+                </div>
+                <div class="metric-icon-circle metric-icon-green">
+                    <i class="bi bi-patch-check"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tables Row: Recent Properties and Recent Applications -->
+    <div class="row g-4 mb-4">
+        <!-- Recent Properties -->
+        <div class="col-lg-6">
+            <div class="bg-white p-4 rounded-4 shadow-sm border border-light h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">Recent Property Listings</h5>
+                    <a asp-action="Properties" class="small text-primary fw-bold text-decoration-none">View All</a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle mb-0">
+                        <thead>
+                            <tr class="text-muted small">
+                                <th>Property</th>
+                                <th>City</th>
+                                <th>Rent</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var p in Model.RecentProperties)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold text-dark text-truncate" style="max-width: 180px;">
+                                            <a asp-controller="Properties" asp-action="Details" asp-route-id="@p.Id" class="text-decoration-none text-dark hover-primary">
+                                                @p.Title
+                                            </a>
+                                        </div>
+                                        <div class="text-muted small" style="font-size: 0.75rem;">@p.Owner?.FullName</div>
+                                    </td>
+                                    <td class="small">@p.City</td>
+                                    <td class="small fw-bold text-primary">$@p.MonthlyRent.ToString("N0")</td>
+                                    <td>
+                                        @if (p.IsActive)
+                                        {
+                                            <span class="badge bg-emerald-light text-emerald border border-emerald-subtle" style="font-size: 0.7rem;">Active</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger-subtle text-danger" style="font-size: 0.7rem;">Inactive</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Applications -->
+        <div class="col-lg-6">
+            <div class="bg-white p-4 rounded-4 shadow-sm border border-light h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">Recent Applications</h5>
+                    <a asp-action="Applications" class="small text-primary fw-bold text-decoration-none">View All</a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle mb-0">
+                        <thead>
+                            <tr class="text-muted small">
+                                <th>Applicant</th>
+                                <th>Property</th>
+                                <th>Applied</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var a in Model.RecentApplications)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold text-dark">@a.Tenant?.FullName</div>
+                                        <div class="text-muted small" style="font-size: 0.75rem;">@a.Occupation</div>
+                                    </td>
+                                    <td class="small text-truncate" style="max-width: 140px;">
+                                        @a.Property?.Title
+                                    </td>
+                                    <td class="small text-muted">@a.AppliedAt.ToString("MMM dd")</td>
+                                    <td>
+                                        @if (a.Status == ApplicationStatus.Pending)
+                                        {
+                                            <span class="badge bg-warning-subtle text-dark" style="font-size: 0.7rem;">Pending</span>
+                                        }
+                                        else if (a.Status == ApplicationStatus.Approved)
+                                        {
+                                            <span class="badge bg-emerald-light text-emerald" style="font-size: 0.7rem;">Approved</span>
+                                        }
+                                        else if (a.Status == ApplicationStatus.Rejected)
+                                        {
+                                            <span class="badge bg-danger-subtle text-danger" style="font-size: 0.7rem;">Rejected</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-light text-muted" style="font-size: 0.7rem;">Cancelled</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Users -->
+    <div class="bg-white p-4 rounded-4 shadow-sm border border-light">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0">Recently Registered Users</h5>
+            <a asp-action="Users" class="small text-primary fw-bold text-decoration-none">Manage Users</a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                    <tr class="text-muted small">
+                        <th>User Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Registered Date</th>
+                        <th>Account Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var u in Model.RecentUsers)
+                    {
+                        <tr>
+                            <td class="fw-bold text-dark">@u.FullName</td>
+                            <td class="small text-muted">@u.Email</td>
+                            <td>
+                                <span class="badge @(u.UserRole == "Admin" ? "bg-dark" : (u.UserRole == "PropertyOwner" ? "bg-primary" : "bg-success"))" style="font-size: 0.7rem;">
+                                    @u.UserRole
+                                </span>
+                            </td>
+                            <td class="small text-muted">@u.CreatedAt.ToString("MMM dd, yyyy")</td>
+                            <td>
+                                @if (u.IsActive)
+                                {
+                                    <span class="badge bg-emerald-light text-emerald">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger-subtle text-danger">Deactivated</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

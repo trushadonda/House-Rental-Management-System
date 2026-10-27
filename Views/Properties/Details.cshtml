@@ -1,0 +1,240 @@
+@model HouseRentalManagementSystem.ViewModels.Property.PropertyDetailsViewModel
+@{
+    ViewData["Title"] = Model.Property.Title;
+    var amenitiesList = !string.IsNullOrWhiteSpace(Model.Property.Amenities)
+        ? Model.Property.Amenities.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(a => a.Trim()).ToList()
+        : new List<string>();
+}
+
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-3 small">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Properties" asp-action="Index" class="text-decoration-none">Properties</a></li>
+            <li class="breadcrumb-item active text-truncate" style="max-width: 300px;" aria-current="page">@Model.Property.Title</li>
+        </ol>
+    </nav>
+
+    <!-- Header Section -->
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+        <div>
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                <span class="badge bg-primary text-white fw-bold">@Model.Property.PropertyType</span>
+                @if (Model.Property.IsFeatured)
+                {
+                    <span class="badge bg-emerald text-white fw-bold"><i class="bi bi-star-fill me-1"></i> Featured</span>
+                }
+                @if (Model.Property.IsAvailable)
+                {
+                    <span class="badge bg-emerald-light text-emerald border border-emerald-subtle fw-bold">Available Now</span>
+                }
+                else
+                {
+                    <span class="badge bg-light text-muted border fw-bold">Currently Rented</span>
+                }
+            </div>
+            <h1 class="fw-extrabold text-dark mb-1">@Model.Property.Title</h1>
+            <div class="text-muted d-flex align-items-center gap-2">
+                <i class="bi bi-geo-alt-fill text-primary"></i>
+                <span>@Model.Property.Address, @Model.Property.City, @Model.Property.State @Model.Property.ZipCode</span>
+            </div>
+        </div>
+
+        <div class="text-lg-end">
+            <div class="fs-2 fw-extrabold text-primary mb-0">
+                $@Model.Property.MonthlyRent.ToString("N0") <span class="fs-6 text-muted fw-normal">/ month</span>
+            </div>
+            <div class="small text-muted">Security Deposit: $@Model.Property.SecurityDeposit.ToString("N0")</div>
+        </div>
+    </div>
+
+    <!-- Main Image & Gallery -->
+    <div class="row g-4 mb-5">
+        <div class="col-lg-8">
+            <div class="rounded-4 overflow-hidden shadow-sm border border-light position-relative" style="height: 440px;">
+                <img src="@Model.Property.ImageUrl" alt="@Model.Property.Title" class="w-100 h-100 object-fit-cover" 
+                     onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1000&q=80';" />
+            </div>
+
+            @if (Model.Property.Images != null && Model.Property.Images.Count > 0)
+            {
+                <div class="d-flex gap-2 mt-3 overflow-auto pb-2">
+                    <img src="@Model.Property.ImageUrl" class="rounded-3 border border-2 border-primary object-fit-cover" style="width: 100px; height: 75px; cursor: pointer;" />
+                    @foreach (var img in Model.Property.Images)
+                    {
+                        <img src="@img.ImageUrl" class="rounded-3 border object-fit-cover" style="width: 100px; height: 75px; cursor: pointer;" />
+                    }
+                </div>
+            }
+
+            <!-- Specifications Strip -->
+            <div class="bg-white p-4 rounded-4 shadow-sm border border-light mt-4">
+                <h5 class="fw-bold text-dark mb-3">Key Features</h5>
+                <div class="row g-3 text-center">
+                    <div class="col-3 border-end">
+                        <i class="bi bi-door-closed fs-3 text-primary d-block mb-1"></i>
+                        <span class="d-block fw-bold text-dark">@Model.Property.Bedrooms Beds</span>
+                        <span class="small text-muted">Bedrooms</span>
+                    </div>
+                    <div class="col-3 border-end">
+                        <i class="bi bi-droplet fs-3 text-primary d-block mb-1"></i>
+                        <span class="d-block fw-bold text-dark">@Model.Property.Bathrooms Baths</span>
+                        <span class="small text-muted">Bathrooms</span>
+                    </div>
+                    <div class="col-3 border-end">
+                        <i class="bi bi-aspect-ratio fs-3 text-primary d-block mb-1"></i>
+                        <span class="d-block fw-bold text-dark">@Model.Property.AreaSqFt</span>
+                        <span class="small text-muted">Sq Feet</span>
+                    </div>
+                    <div class="col-3">
+                        <i class="bi bi-couch fs-3 text-primary d-block mb-1"></i>
+                        <span class="d-block fw-bold text-dark">@Model.Property.FurnishingStatus</span>
+                        <span class="small text-muted">Furnishing</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="bg-white p-4 rounded-4 shadow-sm border border-light mt-4">
+                <h5 class="fw-bold text-dark mb-3">About This Rental Property</h5>
+                <p class="text-secondary" style="white-space: pre-line; line-height: 1.8;">@Model.Property.Description</p>
+            </div>
+
+            <!-- Amenities -->
+            @if (amenitiesList.Count > 0)
+            {
+                <div class="bg-white p-4 rounded-4 shadow-sm border border-light mt-4">
+                    <h5 class="fw-bold text-dark mb-3">Amenities &amp; Facilities</h5>
+                    <div class="row g-3">
+                        @foreach (var amenity in amenitiesList)
+                        {
+                            <div class="col-md-4 col-6">
+                                <div class="d-flex align-items-center gap-2 p-2 rounded-3 bg-light text-dark fw-semibold small">
+                                    <i class="bi bi-check-circle-fill text-success"></i>
+                                    <span>@amenity</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Sidebar / Landlord Info & Application Card -->
+        <div class="col-lg-4">
+            <div class="sticky-top" style="top: 95px;">
+                <!-- Application Action Card -->
+                <div class="bg-white p-4 rounded-4 shadow-sm border border-light mb-4">
+                    <div class="mb-3">
+                        <div class="text-muted small">Rental Pricing</div>
+                        <div class="d-flex align-items-baseline gap-2">
+                            <h3 class="fw-extrabold text-primary mb-0">$@Model.Property.MonthlyRent.ToString("N0")</h3>
+                            <span class="text-muted">/ month</span>
+                        </div>
+                    </div>
+
+                    <hr class="border-light" />
+
+                    @if (Model.IsOwner)
+                    {
+                        <div class="alert alert-info py-2 small mb-3">
+                            <i class="bi bi-info-circle me-1"></i> You are the registered owner of this listing.
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <a asp-action="Edit" asp-route-id="@Model.Property.Id" class="btn btn-primary fw-bold">
+                                <i class="bi bi-pencil-square me-1"></i> Edit This Listing
+                            </a>
+
+                            <form asp-action="ToggleAvailability" asp-route-id="@Model.Property.Id" method="post">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-outline-secondary w-100 fw-semibold">
+                                    <i class="bi bi-arrow-repeat me-1"></i>
+                                    @(Model.Property.IsAvailable ? "Mark as Rented / Unavailable" : "Mark as Available")
+                                </button>
+                            </form>
+                        </div>
+                    }
+                    else if (User.Identity != null && User.Identity.IsAuthenticated)
+                    {
+                        @if (Model.HasActiveApplication)
+                        {
+                            <div class="p-3 rounded-3 text-center mb-3 @(Model.UserApplicationStatus == ApplicationStatus.Approved ? "bg-emerald-light border border-emerald-subtle" : "bg-warning-subtle border border-warning-subtle")">
+                                <div class="fw-bold @(Model.UserApplicationStatus == ApplicationStatus.Approved ? "text-emerald-dark" : "text-dark")">
+                                    Application Status: @Model.UserApplicationStatus
+                                </div>
+                                <div class="small text-secondary mt-1">You have already submitted an active application for this house.</div>
+                            </div>
+
+                            <a asp-controller="Applications" asp-action="MyApplications" class="btn btn-primary w-100 fw-bold">
+                                <i class="bi bi-journal-text me-1"></i> View In My Applications
+                            </a>
+                        }
+                        else if (!Model.Property.IsAvailable)
+                        {
+                            <div class="alert alert-secondary text-center small mb-0">
+                                <i class="bi bi-slash-circle me-1"></i> This property is currently not accepting new applications.
+                            </div>
+                        }
+                        else
+                        {
+                            <a asp-controller="Applications" asp-action="Apply" asp-route-propertyId="@Model.Property.Id" class="btn btn-primary w-100 py-3 fw-bold fs-6">
+                                <i class="bi bi-send-check me-1"></i> Apply For This House
+                            </a>
+                            <div class="text-center small text-muted mt-2">Free application &bull; Verified owner review</div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="p-3 rounded-3 bg-light text-center mb-3">
+                            <div class="fw-semibold text-dark mb-1">Interested in renting?</div>
+                            <div class="small text-muted mb-3">Sign in as a tenant to submit your rental application.</div>
+                            <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.Path" class="btn btn-primary w-100 fw-bold">
+                                <i class="bi bi-box-arrow-in-right me-1"></i> Sign In to Apply
+                            </a>
+                        </div>
+                    }
+                </div>
+
+                <!-- Landlord Contact Card -->
+                <div class="bg-white p-4 rounded-4 shadow-sm border border-light">
+                    <h6 class="fw-bold text-dark mb-3">Property Landlord</h6>
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="rounded-circle bg-primary-light text-primary d-flex align-items-center justify-content-center fw-bold fs-4" style="width: 52px; height: 52px;">
+                            @(Model.Property.Owner?.FullName?.Substring(0, 1).ToUpper() ?? "L")
+                        </div>
+                        <div>
+                            <div class="fw-bold text-dark">@(Model.Property.Owner?.FullName ?? "Premier Landlord")</div>
+                            <div class="small text-muted"><i class="bi bi-patch-check-fill text-success me-1"></i> Verified Owner</div>
+                        </div>
+                    </div>
+
+                    <div class="small text-secondary mb-2">
+                        <i class="bi bi-telephone text-primary me-2"></i> @(Model.Property.Owner?.PhoneNumber ?? "Contact through application")
+                    </div>
+                    <div class="small text-secondary mb-3">
+                        <i class="bi bi-envelope text-primary me-2"></i> @(Model.Property.Owner?.Email ?? "owner@renthaven.com")
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Similar Properties Section -->
+    @if (Model.SimilarProperties != null && Model.SimilarProperties.Count > 0)
+    {
+        <div class="mt-5 pt-4 border-top">
+            <h4 class="fw-bold mb-4">Similar Rental Properties You May Like</h4>
+            <div class="row g-4">
+                @foreach (var sim in Model.SimilarProperties)
+                {
+                    <div class="col-lg-4 col-md-6">
+                        @await Html.PartialAsync("_PropertyCard", sim)
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+

@@ -1,0 +1,191 @@
+@model HouseRentalManagementSystem.ViewModels.Property.PropertyCreateEditViewModel
+@{
+    ViewData["Title"] = "Add New Rental Listing";
+    string[] allAmenities = new string[] {
+        "WiFi", "Parking", "Air Conditioning", "Balcony", "Swimming Pool", 
+        "Gym", "Power Backup", "Security", "Pet Friendly", "Elevator"
+    };
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h2 class="fw-bold mb-1">Post a Rental Property</h2>
+                    <p class="text-secondary small mb-0">Fill in the property details and upload photos to list your home</p>
+                </div>
+                <a asp-action="MyProperties" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i> Back to My Listings
+                </a>
+            </div>
+
+            <div class="bg-white p-4 p-md-5 rounded-4 shadow-sm border border-light">
+                <form asp-action="Create" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+                    <!-- Basic Information -->
+                    <h5 class="fw-bold text-primary mb-3 pb-2 border-bottom">1. Basic Property Information</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-12">
+                            <label asp-for="Title" class="form-label"></label>
+                            <input asp-for="Title" class="form-control" placeholder="e.g. Modern 3-BHK Sunny Luxury Apartment with Balcony" />
+                            <span asp-validation-for="Title" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="PropertyType" class="form-label"></label>
+                            <select asp-for="PropertyType" class="form-select">
+                                <option value="Apartment">Apartment</option>
+                                <option value="Villa">Villa</option>
+                                <option value="Independent House">Independent House</option>
+                                <option value="Studio">Studio</option>
+                                <option value="Condo">Condo</option>
+                            </select>
+                            <span asp-validation-for="PropertyType" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="FurnishingStatus" class="form-label"></label>
+                            <select asp-for="FurnishingStatus" class="form-select">
+                                <option value="Furnished">Fully Furnished</option>
+                                <option value="Semi-Furnished">Semi-Furnished</option>
+                                <option value="Unfurnished">Unfurnished</option>
+                            </select>
+                            <span asp-validation-for="FurnishingStatus" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="Description" class="form-label"></label>
+                            <textarea asp-for="Description" rows="4" class="form-control" placeholder="Describe the layout, natural lighting, neighborhood amenities, nearby metro/schools, and rental policies..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <!-- Location Details -->
+                    <h5 class="fw-bold text-primary mb-3 pb-2 border-bottom">2. Location Details</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-12">
+                            <label asp-for="Address" class="form-label"></label>
+                            <input asp-for="Address" class="form-control" placeholder="Street Address, Apt / Suite number" />
+                            <span asp-validation-for="Address" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="City" class="form-label"></label>
+                            <input asp-for="City" class="form-control" placeholder="e.g. Chicago" />
+                            <span asp-validation-for="City" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="State" class="form-label"></label>
+                            <input asp-for="State" class="form-control" placeholder="e.g. IL" />
+                            <span asp-validation-for="State" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="ZipCode" class="form-label"></label>
+                            <input asp-for="ZipCode" class="form-control" placeholder="e.g. 60601" />
+                            <span asp-validation-for="ZipCode" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <!-- Pricing & Specifications -->
+                    <h5 class="fw-bold text-primary mb-3 pb-2 border-bottom">3. Rent, Deposit &amp; Space</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3 col-6">
+                            <label asp-for="MonthlyRent" class="form-label"></label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input asp-for="MonthlyRent" class="form-control" step="25" />
+                            </div>
+                            <span asp-validation-for="MonthlyRent" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-3 col-6">
+                            <label asp-for="SecurityDeposit" class="form-label"></label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input asp-for="SecurityDeposit" class="form-control" step="25" />
+                            </div>
+                            <span asp-validation-for="SecurityDeposit" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-2 col-4">
+                            <label asp-for="Bedrooms" class="form-label"></label>
+                            <input asp-for="Bedrooms" type="number" class="form-control" min="0" max="20" />
+                            <span asp-validation-for="Bedrooms" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-2 col-4">
+                            <label asp-for="Bathrooms" class="form-label"></label>
+                            <input asp-for="Bathrooms" type="number" class="form-control" min="1" max="20" />
+                            <span asp-validation-for="Bathrooms" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-2 col-4">
+                            <label asp-for="AreaSqFt" class="form-label"></label>
+                            <input asp-for="AreaSqFt" type="number" class="form-control" step="10" />
+                            <span asp-validation-for="AreaSqFt" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <!-- Amenities -->
+                    <h5 class="fw-bold text-primary mb-3 pb-2 border-bottom">4. Amenities &amp; Features</h5>
+                    <div class="row g-3 mb-4">
+                        @foreach (var amenity in allAmenities)
+                        {
+                            <div class="col-md-3 col-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="SelectedAmenities" value="@amenity" id="amenity_@amenity" />
+                                    <label class="form-check-label small" for="amenity_@amenity">@amenity</label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Image Uploads -->
+                    <h5 class="fw-bold text-primary mb-3 pb-2 border-bottom">5. Property Photos</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label asp-for="MainImageFile" class="form-label"></label>
+                            <input asp-for="MainImageFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp" />
+                            <small class="text-muted d-block mt-1">Recommended size 1200x800px. Formats: JPG, PNG, WEBP (Max 5MB)</small>
+                            <span asp-validation-for="MainImageFile" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="AdditionalImageFiles" class="form-label"></label>
+                            <input asp-for="AdditionalImageFiles" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp" multiple />
+                            <small class="text-muted d-block mt-1">Optional gallery images for interior, bathrooms, kitchen</small>
+                        </div>
+                    </div>
+
+                    <!-- Availability Flag -->
+                    <div class="mb-4 p-3 bg-light rounded-3 d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="fw-bold text-dark">Available for Rent Immediately</div>
+                            <div class="small text-muted">Tenants can search and submit applications right after posting</div>
+                        </div>
+                        <div class="form-check form-switch fs-4">
+                            <input asp-for="IsAvailable" class="form-check-input" type="checkbox" role="switch" checked />
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-action="MyProperties" class="btn btn-secondary-soft px-4 py-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-5 py-2 fw-bold">
+                            <i class="bi bi-cloud-arrow-up me-1"></i> Publish Property Listing
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+

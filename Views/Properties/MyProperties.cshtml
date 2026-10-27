@@ -1,0 +1,202 @@
+@model List<HouseRentalManagementSystem.Models.Property>
+@{
+    ViewData["Title"] = "My Listed Properties";
+}
+
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 small">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">My Properties</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold mb-0">My Listed Properties</h2>
+            <p class="text-muted small mb-0">Manage all your rental listings, update pricing, and track tenant applications</p>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a asp-controller="Applications" asp-action="OwnerApplications" class="btn btn-outline-primary position-relative">
+                <i class="bi bi-inbox me-1"></i> Tenant Applications
+                @if (ViewBag.PendingApplicationsCount != null && (int)ViewBag.PendingApplicationsCount > 0)
+                {
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        @ViewBag.PendingApplicationsCount
+                    </span>
+                }
+            </a>
+            <a asp-action="Create" class="btn btn-emerald">
+                <i class="bi bi-plus-circle me-1"></i> Add New Property
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="metric-card">
+                <div>
+                    <div class="text-muted small">Total Properties</div>
+                    <div class="fs-3 fw-bold text-dark">@Model.Count</div>
+                </div>
+                <div class="metric-icon-circle metric-icon-blue">
+                    <i class="bi bi-houses"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="metric-card">
+                <div>
+                    <div class="text-muted small">Available for Rent</div>
+                    <div class="fs-3 fw-bold text-success">@Model.Count(p => p.IsAvailable && p.IsActive)</div>
+                </div>
+                <div class="metric-icon-circle metric-icon-green">
+                    <i class="bi bi-check2-circle"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="metric-card">
+                <div>
+                    <div class="text-muted small">Rented / Inactive</div>
+                    <div class="fs-3 fw-bold text-muted">@Model.Count(p => !p.IsAvailable || !p.IsActive)</div>
+                </div>
+                <div class="metric-icon-circle metric-icon-amber">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Properties Table / List -->
+    @if (Model != null && Model.Count > 0)
+    {
+        <div class="custom-table table-responsive">
+            <table class="table mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th style="min-width: 250px;">Property</th>
+                        <th>City &amp; Location</th>
+                        <th>Monthly Rent</th>
+                        <th>Specs</th>
+                        <th>Status</th>
+                        <th>Applications</th>
+                        <th class="text-end" style="min-width: 180px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <img src="@item.ImageUrl" alt="@item.Title" class="rounded-3 object-fit-cover border" style="width: 64px; height: 50px;" 
+                                         onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1000&q=80';" />
+                                    <div>
+                                        <div class="fw-bold text-dark text-truncate" style="max-width: 220px;">
+                                            <a asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none text-dark hover-primary">
+                                                @item.Title
+                                            </a>
+                                        </div>
+                                        <span class="badge bg-light text-muted border small">@item.PropertyType</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="fw-semibold text-dark">@item.City</div>
+                                <div class="small text-muted text-truncate" style="max-width: 150px;">@item.Address</div>
+                            </td>
+                            <td>
+                                <div class="fw-bold text-primary">$@item.MonthlyRent.ToString("N0")</div>
+                                <div class="small text-muted">Deposit: $@item.SecurityDeposit.ToString("N0")</div>
+                            </td>
+                            <td>
+                                <div class="small text-secondary">@item.Bedrooms Bed &bull; @item.Bathrooms Bath</div>
+                                <div class="small text-muted">@item.AreaSqFt sqft</div>
+                            </td>
+                            <td>
+                                @if (item.IsAvailable)
+                                {
+                                    <span class="badge bg-emerald-light text-emerald border border-emerald-subtle">Available</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-light text-muted border">Rented</span>
+                                }
+
+                                @if (!item.IsActive)
+                                {
+                                    <div class="badge bg-danger-subtle text-danger mt-1">Admin Inactive</div>
+                                }
+                            </td>
+                            <td>
+                                <a asp-controller="Applications" asp-action="OwnerApplications" asp-route-propertyId="@item.Id" class="btn btn-sm btn-light border position-relative">
+                                    <i class="bi bi-inbox me-1"></i> @item.Applications.Count
+                                </a>
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-secondary" title="View Details">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary" title="Edit Listing">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form asp-action="ToggleAvailability" asp-route-id="@item.Id" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-outline-secondary" title="@(item.IsAvailable ? "Mark Rented" : "Mark Available")">
+                                            <i class="bi @(item.IsAvailable ? "bi-toggle-on text-success" : "bi-toggle-off text-muted")"></i>
+                                        </button>
+                                    </form>
+                                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal_@item.Id" title="Delete Listing">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Delete Modal -->
+                                <div class="modal fade text-start" id="deleteModal_@item.Id" tabindex="-1" aria-labelledby="modalLabel_@item.Id" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content border-0 shadow">
+                                            <div class="modal-header border-0 pb-0">
+                                                <h5 class="modal-title fw-bold text-danger" id="modalLabel_@item.Id">
+                                                    <i class="bi bi-exclamation-triangle-fill me-2"></i> Delete Property
+                                                </h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body py-3">
+                                                Are you sure you want to delete <strong>@item.Title</strong>? This action will permanently remove the listing and any associated applications.
+                                            </div>
+                                            <div class="modal-footer border-0 pt-0">
+                                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="bg-white p-5 rounded-4 shadow-sm border text-center my-4">
+            <div class="rounded-circle bg-light text-muted mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+                <i class="bi bi-house-add fs-2 text-primary"></i>
+            </div>
+            <h4 class="fw-bold text-dark">No Properties Listed Yet</h4>
+            <p class="text-secondary small mb-3">You have not posted any rental houses. Click below to add your first property listing.</p>
+            <a asp-action="Create" class="btn btn-primary fw-bold">
+                <i class="bi bi-plus-circle me-1"></i> List My First Property
+            </a>
+        </div>
+    }
+</div>
+

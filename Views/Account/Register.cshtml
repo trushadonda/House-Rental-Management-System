@@ -1,0 +1,100 @@
+@model HouseRentalManagementSystem.ViewModels.Account.RegisterViewModel
+@{
+    ViewData["Title"] = "Create an Account";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-md-9">
+            <div class="bg-white p-4 p-md-5 rounded-4 shadow-sm border border-light">
+                <div class="text-center mb-4">
+                    <span class="brand-icon-wrapper mx-auto mb-2" style="width: 48px; height: 48px;">
+                        <i class="bi bi-person-plus-fill fs-4"></i>
+                    </span>
+                    <h2 class="fw-bold text-dark">Join RentHaven</h2>
+                    <p class="text-secondary small">Register to browse properties or list your homes for rent</p>
+                </div>
+
+                <form asp-action="Register" method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+                    <!-- Role Selection Cards -->
+                    <div class="mb-4">
+                        <label class="form-label d-block text-center fw-bold">Select Your Role</label>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label class="p-3 border rounded-3 w-100 text-center cursor-pointer role-card" for="roleTenant" style="cursor: pointer;">
+                                    <input type="radio" asp-for="Role" value="Tenant" id="roleTenant" class="form-check-input me-1" checked />
+                                    <div class="fw-bold text-primary mt-1"><i class="bi bi-person-heart me-1"></i> Tenant</div>
+                                    <div class="text-muted small" style="font-size: 0.75rem;">I want to find &amp; rent a home</div>
+                                </label>
+                            </div>
+                            <div class="col-6">
+                                <label class="p-3 border rounded-3 w-100 text-center cursor-pointer role-card" for="roleOwner" style="cursor: pointer;">
+                                    <input type="radio" asp-for="Role" value="PropertyOwner" id="roleOwner" class="form-check-input me-1" />
+                                    <div class="fw-bold text-success mt-1"><i class="bi bi-building-check me-1"></i> Landlord / Owner</div>
+                                    <div class="text-muted small" style="font-size: 0.75rem;">I want to list rental houses</div>
+                                </label>
+                            </div>
+                        </div>
+                        <span asp-validation-for="Role" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="FullName" class="form-label"></label>
+                            <input asp-for="FullName" class="form-control" placeholder="e.g. Elena Rostova" />
+                            <span asp-validation-for="FullName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" class="form-control" placeholder="name@example.com" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="PhoneNumber" class="form-label"></label>
+                            <input asp-for="PhoneNumber" class="form-control" placeholder="+1 555-0199" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Address" class="form-label"></label>
+                            <input asp-for="Address" class="form-control" placeholder="City, State" />
+                            <span asp-validation-for="Address" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Password" class="form-label"></label>
+                            <input asp-for="Password" class="form-control" placeholder="Minimum 6 characters" />
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="ConfirmPassword" class="form-label"></label>
+                            <input asp-for="ConfirmPassword" class="form-control" placeholder="Repeat your password" />
+                            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4 form-check">
+                        <input type="checkbox" class="form-check-input" id="termsCheck" required />
+                        <label class="form-check-label small text-secondary" for="termsCheck">
+                            I agree to the <a href="#" class="text-primary text-decoration-none">Rental Terms of Service</a> and Privacy Standards.
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-bold fs-6">
+                        <i class="bi bi-shield-check me-1"></i> Register Account
+                    </button>
+
+                    <div class="text-center mt-4 pt-2 border-top small text-secondary">
+                        Already have an account? <a asp-action="Login" class="text-primary fw-bold text-decoration-none">Sign In here</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+

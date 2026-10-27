@@ -1,0 +1,159 @@
+@model List<HouseRentalManagementSystem.Models.Property>
+@{
+    ViewData["Title"] = "Property Management - Admin";
+    var selectedStatus = ViewBag.SelectedStatus as string;
+    var searchTerm = ViewBag.SearchTerm as string;
+}
+
+<div class="container py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 small">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none">Home</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none">Admin Console</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Property Management</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold mb-0">System Property Listings</h2>
+            <p class="text-muted small mb-0">Moderate listings, inspect property owner details, and deactivate inappropriate postings</p>
+        </div>
+
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Dashboard Overview
+        </a>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="bg-white p-3 rounded-4 shadow-sm border border-light mb-4">
+        <form asp-action="Properties" method="get" class="row g-2 align-items-center">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" value="@searchTerm" class="form-control border-start-0" placeholder="Search by title, city, or owner..." />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <select name="statusFilter" class="form-select" onchange="this.form.submit()">
+                    <option value="">All Listing Statuses</option>
+                    <option value="active" selected="@(selectedStatus == "active")">Active Only</option>
+                    <option value="inactive" selected="@(selectedStatus == "inactive")">Deactivated Only</option>
+                </select>
+            </div>
+            <div class="col-md-3 text-md-end d-flex gap-2">
+                <button type="submit" class="btn btn-primary btn-sm px-3">Search</button>
+                <a asp-action="Properties" class="btn btn-outline-secondary btn-sm">Reset</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Properties Table -->
+    @if (Model != null && Model.Count > 0)
+    {
+        <div class="custom-table table-responsive">
+            <table class="table mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th style="min-width: 250px;">Property Title</th>
+                        <th>Owner</th>
+                        <th>Location</th>
+                        <th>Rent</th>
+                        <th>Availability</th>
+                        <th>Moderation Status</th>
+                        <th class="text-end" style="min-width: 150px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var property in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <img src="@property.ImageUrl" alt="@property.Title" class="rounded-3 object-fit-cover border" style="width: 60px; height: 48px;" 
+                                         onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1000&q=80';" />
+                                    <div>
+                                        <div class="fw-bold text-dark text-truncate" style="max-width: 220px;">
+                                            <a asp-controller="Properties" asp-action="Details" asp-route-id="@property.Id" class="text-decoration-none text-dark hover-primary">
+                                                @property.Title
+                                            </a>
+                                        </div>
+                                        <span class="badge bg-light text-muted border small">@property.PropertyType</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="fw-bold text-dark">@(property.Owner?.FullName ?? "Unknown")</div>
+                                <div class="small text-muted">@(property.Owner?.Email ?? "No email")</div>
+                            </td>
+                            <td>
+                                <div class="small text-dark fw-semibold">@property.City, @property.State</div>
+                                <div class="text-muted small text-truncate" style="max-width: 150px;">@property.Address</div>
+                            </td>
+                            <td>
+                                <div class="fw-bold text-primary">$@property.MonthlyRent.ToString("N0")</div>
+                            </td>
+                            <td>
+                                @if (property.IsAvailable)
+                                {
+                                    <span class="badge bg-emerald-light text-emerald border border-emerald-subtle">Available</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-light text-muted border">Rented</span>
+                                }
+                            </td>
+                            <td>
+                                @if (property.IsActive)
+                                {
+                                    <span class="badge bg-emerald-light text-emerald border border-emerald-subtle">
+                                        <i class="bi bi-check-circle me-1"></i> Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                                        <i class="bi bi-shield-slash me-1"></i> Deactivated
+                                    </span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-1">
+                                    <a asp-controller="Properties" asp-action="Details" asp-route-id="@property.Id" class="btn btn-sm btn-outline-secondary" title="View Property">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-controller="Properties" asp-action="Edit" asp-route-id="@property.Id" class="btn btn-sm btn-outline-primary" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form asp-action="TogglePropertyActive" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="propertyId" value="@property.Id" />
+                                        @if (property.IsActive)
+                                        {
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Deactivate Listing">
+                                                <i class="bi bi-slash-circle me-1"></i> Deactivate
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="submit" class="btn btn-sm btn-outline-success" title="Activate Listing">
+                                                <i class="bi bi-check-circle me-1"></i> Activate
+                                            </button>
+                                        }
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="bg-white p-5 rounded-4 shadow-sm border text-center my-4">
+            <h4 class="fw-bold text-dark">No Properties Found</h4>
+            <p class="text-secondary small mb-0">No listings match the selected filters.</p>
+        </div>
+    }
+</div>
+

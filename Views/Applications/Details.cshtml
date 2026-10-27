@@ -1,0 +1,159 @@
+@model HouseRentalManagementSystem.Models.RentalApplication
+@{
+    ViewData["Title"] = "Application Details";
+    bool canReview = ViewBag.CanReview ?? false;
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h2 class="fw-bold mb-1">Rental Application Summary</h2>
+                    <p class="text-secondary small mb-0">Application ID: #@Model.Id &bull; Submitted on @Model.AppliedAt.ToString("MMMM dd, yyyy")</p>
+                </div>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="history.back()">
+                    <i class="bi bi-arrow-left me-1"></i> Back
+                </button>
+            </div>
+
+            <!-- Current Status Banner -->
+            <div class="p-3 rounded-4 mb-4 d-flex align-items-center justify-content-between border @(Model.Status == ApplicationStatus.Approved ? "bg-emerald-light border-emerald-subtle" : (Model.Status == ApplicationStatus.Rejected ? "bg-danger-subtle border-danger-subtle" : "bg-warning-subtle border-warning-subtle"))">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="fs-2 @(Model.Status == ApplicationStatus.Approved ? "text-emerald-dark" : (Model.Status == ApplicationStatus.Rejected ? "text-danger" : "text-amber"))">
+                        <i class="bi @(Model.Status == ApplicationStatus.Approved ? "bi-check-circle-fill" : (Model.Status == ApplicationStatus.Rejected ? "bi-x-circle-fill" : "bi-clock-fill"))"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-dark fs-5">Status: @Model.Status</div>
+                        <div class="small text-secondary">
+                            @(Model.ReviewedAt.HasValue ? $"Reviewed on {Model.ReviewedAt.Value:MMM dd, yyyy}" : "Awaiting property landlord decision")
+                        </div>
+                    </div>
+                </div>
+
+                @if (canReview)
+                {
+                    <button type="button" class="btn btn-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                        Update Decision
+                    </button>
+                }
+            </div>
+
+            <!-- Property Card -->
+            <div class="bg-white p-4 rounded-4 shadow-sm border border-light mb-4">
+                <h5 class="fw-bold text-primary mb-3">Applied Property</h5>
+                <div class="d-flex align-items-center gap-3">
+                    <img src="@(Model.Property?.ImageUrl ?? "/images/properties/default-house.jpg")" alt="@Model.Property?.Title" class="rounded-3 object-fit-cover border" style="width: 120px; height: 90px;" 
+                         onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1000&q=80';" />
+                    <div>
+                        <h5 class="fw-bold text-dark mb-1">
+                            <a asp-controller="Properties" asp-action="Details" asp-route-id="@Model.PropertyId" class="text-decoration-none text-dark hover-primary">
+                                @Model.Property?.Title
+                            </a>
+                        </h5>
+                        <div class="text-muted small mb-2"><i class="bi bi-geo-alt text-primary"></i> @Model.Property?.Address, @Model.Property?.City</div>
+                        <div class="d-flex gap-3 small">
+                            <span class="fw-bold text-primary">Rent: $@Model.Property?.MonthlyRent.ToString("N0")/month</span>
+                            <span class="text-secondary">Deposit: $@Model.Property?.SecurityDeposit.ToString("N0")</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Applicant Information -->
+            <div class="bg-white p-4 rounded-4 shadow-sm border border-light mb-4">
+                <h5 class="fw-bold text-primary mb-3">Applicant Information</h5>
+                <div class="row g-3">
+                    <div class="col-md-6 border-bottom pb-2">
+                        <span class="text-muted small d-block">Full Legal Name</span>
+                        <span class="fw-bold text-dark">@Model.Tenant?.FullName</span>
+                    </div>
+                    <div class="col-md-6 border-bottom pb-2">
+                        <span class="text-muted small d-block">Email Address</span>
+                        <span class="fw-semibold text-dark">@Model.Tenant?.Email</span>
+                    </div>
+                    <div class="col-md-6 border-bottom pb-2">
+                        <span class="text-muted small d-block">Phone Number</span>
+                        <span class="fw-semibold text-dark">@Model.Tenant?.PhoneNumber</span>
+                    </div>
+                    <div class="col-md-6 border-bottom pb-2">
+                        <span class="text-muted small d-block">Monthly Verified Income</span>
+                        <span class="fw-bold text-success">$@Model.MonthlyIncome.ToString("N0")</span>
+                    </div>
+                    <div class="col-md-6 border-bottom pb-2">
+                        <span class="text-muted small d-block">Current Occupation</span>
+                        <span class="fw-semibold text-dark">@Model.Occupation</span>
+                    </div>
+                    <div class="col-md-6 border-bottom pb-2">
+                        <span class="text-muted small d-block">Proposed Move-In Date</span>
+                        <span class="fw-bold text-dark">@Model.ProposedMoveInDate.ToString("MMMM dd, yyyy")</span>
+                    </div>
+                    <div class="col-md-6 border-bottom pb-2">
+                        <span class="text-muted small d-block">Number of Occupants</span>
+                        <span class="fw-semibold text-dark">@Model.NumberOfOccupants Person(s)</span>
+                    </div>
+                    <div class="col-md-6 border-bottom pb-2">
+                        <span class="text-muted small d-block">Application Submission Date</span>
+                        <span class="fw-semibold text-dark">@Model.AppliedAt.ToString("g")</span>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.Message))
+                    {
+                        <div class="col-12 mt-3">
+                            <span class="text-muted small d-block">Applicant Message to Landlord</span>
+                            <div class="p-3 bg-light rounded-3 text-secondary mt-1">@Model.Message</div>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.ReviewerRemarks))
+                    {
+                        <div class="col-12 mt-3">
+                            <span class="text-muted small d-block">Landlord Reviewer Remarks</span>
+                            <div class="p-3 bg-emerald-light rounded-3 text-dark border border-emerald-subtle mt-1">@Model.ReviewerRemarks</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (canReview)
+{
+    <!-- Review Modal -->
+    <div class="modal fade text-start" id="reviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <form asp-action="UpdateStatus" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="applicationId" value="@Model.Id" />
+
+                    <div class="modal-header border-0 pb-0">
+                        <h5 class="modal-title fw-bold">Review Decision for @Model.Tenant?.FullName</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body py-3">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Select Status</label>
+                            <select name="status" class="form-select" required>
+                                <option value="1" selected="@(Model.Status == ApplicationStatus.Approved)">Approve Application</option>
+                                <option value="2" selected="@(Model.Status == ApplicationStatus.Rejected)">Reject Application</option>
+                                <option value="0" selected="@(Model.Status == ApplicationStatus.Pending)">Leave Pending</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Remarks for Applicant</label>
+                            <textarea name="reviewerRemarks" rows="3" class="form-control" placeholder="Optional comments...">@Model.ReviewerRemarks</textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary fw-bold">Submit Decision</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+

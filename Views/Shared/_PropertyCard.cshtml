@@ -1,0 +1,71 @@
+@model HouseRentalManagementSystem.Models.Property
+
+<div class="property-card">
+    <div class="property-img-wrapper">
+        <img src="@Model.ImageUrl" alt="@Model.Title" class="property-img" loading="lazy" 
+             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1000&q=80';" />
+        
+        <span class="property-type-tag">@Model.PropertyType</span>
+
+        @if (Model.IsFeatured)
+        {
+            <span class="property-featured-tag">
+                <i class="bi bi-star-fill me-1"></i> Featured
+            </span>
+        }
+
+        <div class="property-price-badge">
+            $@Model.MonthlyRent.ToString("N0") <small>/ month</small>
+        </div>
+    </div>
+
+    <div class="property-body">
+        <h5 class="property-title">
+            <a asp-controller="Properties" asp-action="Details" asp-route-id="@Model.Id" class="text-decoration-none text-dark hover-primary">
+                @Model.Title
+            </a>
+        </h5>
+
+        <div class="property-location">
+            <i class="bi bi-geo-alt-fill text-primary"></i>
+            <span>@Model.City, @Model.State</span>
+        </div>
+
+        <div class="property-specs">
+            <div class="spec-item" title="Bedrooms">
+                <i class="bi bi-door-closed text-primary"></i>
+                <span>@Model.Bedrooms Beds</span>
+            </div>
+            <div class="spec-item" title="Bathrooms">
+                <i class="bi bi-droplet text-primary"></i>
+                <span>@Model.Bathrooms Baths</span>
+            </div>
+            <div class="spec-item" title="Area">
+                <i class="bi bi-aspect-ratio text-primary"></i>
+                <span>@Model.AreaSqFt sqft</span>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-auto pt-2">
+            <div>
+                @if (Model.IsAvailable)
+                {
+                    <span class="badge bg-emerald-light text-emerald fw-semibold border border-emerald-subtle" style="font-size: 0.75rem;">
+                        <i class="bi bi-check-circle me-1"></i> Available
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-light text-muted fw-semibold border" style="font-size: 0.75rem;">
+                        <i class="bi bi-x-circle me-1"></i> Rented
+                    </span>
+                }
+            </div>
+
+            <a asp-controller="Properties" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-primary px-3">
+                Details <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+    </div>
+</div>
+

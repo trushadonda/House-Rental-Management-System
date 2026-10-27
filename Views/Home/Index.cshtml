@@ -1,0 +1,328 @@
+@model HouseRentalManagementSystem.ViewModels.Home.HomeViewModel
+@{
+    ViewData["Title"] = "Find Your Dream Rental Home";
+}
+
+<!-- Hero Section -->
+<section class="hero-wrapper">
+    <div class="container position-relative">
+        <div class="row align-items-center justify-content-between g-5">
+            <div class="col-lg-6">
+                <div class="hero-pill-badge">
+                    <i class="bi bi-patch-check-fill text-success"></i> Verified Rental Properties &amp; Instant Applications
+                </div>
+                <h1 class="display-4 fw-extrabold text-dark mb-3" style="line-height: 1.15;">
+                    The Smarter Way to <span class="text-primary">Rent Your Home</span>.
+                </h1>
+                <p class="lead text-secondary mb-4" style="font-size: 1.12rem;">
+                    Browse verified residential apartments, villas, and modern independent houses. Apply directly online and connect with trusted property owners without middlemen.
+                </p>
+
+                <!-- Metric Highlights -->
+                <div class="d-flex flex-wrap gap-4 pt-2">
+                    <div>
+                        <div class="fs-3 fw-bold text-dark">@(Model.TotalPropertiesCount > 0 ? Model.TotalPropertiesCount + "+" : "50+")</div>
+                        <div class="small text-muted">Homes Listed</div>
+                    </div>
+                    <div class="border-start ps-4">
+                        <div class="fs-3 fw-bold text-dark">@(Model.TotalCitiesCount > 0 ? Model.TotalCitiesCount : 6)</div>
+                        <div class="small text-muted">Prime Cities</div>
+                    </div>
+                    <div class="border-start ps-4">
+                        <div class="fs-3 fw-bold text-dark">100%</div>
+                        <div class="small text-muted">Verified Owners</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <!-- Hero Search Card -->
+                <div class="hero-search-card">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="p-2 rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <h4 class="mb-0 fw-bold fs-5">Search Available Rentals</h4>
+                    </div>
+
+                    <form asp-controller="Properties" asp-action="Index" method="get">
+                        <div class="mb-3">
+                            <label class="form-label small text-muted"><i class="bi bi-geo-alt me-1 text-primary"></i> City or Location</label>
+                            <input type="text" name="city" class="form-control" placeholder="e.g. Chicago, Austin, Seattle..." />
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label small text-muted"><i class="bi bi-building me-1 text-primary"></i> Property Type</label>
+                                <select name="propertyType" class="form-select">
+                                    <option value="">All Types</option>
+                                    <option value="Apartment">Apartment</option>
+                                    <option value="Villa">Villa</option>
+                                    <option value="Independent House">House</option>
+                                    <option value="Studio">Studio</option>
+                                    <option value="Condo">Condo</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted"><i class="bi bi-door-closed me-1 text-primary"></i> Bedrooms</label>
+                                <select name="bedrooms" class="form-select">
+                                    <option value="">Any</option>
+                                    <option value="1">1 BHK / Bed</option>
+                                    <option value="2">2 BHK / Bed</option>
+                                    <option value="3">3 BHK / Bed</option>
+                                    <option value="4">4+ Beds</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label small text-muted"><i class="bi bi-currency-dollar me-1 text-primary"></i> Maximum Monthly Rent ($)</label>
+                            <input type="number" name="maxRent" class="form-control" placeholder="e.g. 3500" step="100" />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2 fs-6 fw-bold">
+                            <i class="bi bi-search me-1"></i> Find Available Properties
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Property Categories Section -->
+<section class="py-5" style="background-color: #ffffff;">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-semibold mb-2">Explore By Category</span>
+            <h2 class="fw-bold">Designed For Every Lifestyle</h2>
+            <p class="text-muted">Explore high-quality rental accommodations matching your unique preference</p>
+        </div>
+
+        <div class="row g-4">
+            @foreach (var cat in Model.Categories)
+            {
+                <div class="col-lg col-md-4 col-sm-6">
+                    <a asp-controller="Properties" asp-action="Index" asp-route-propertyType="@cat.Name" class="text-decoration-none">
+                        <div class="category-card">
+                            <div class="category-icon-box">
+                                <i class="bi @cat.IconClass"></i>
+                            </div>
+                            <h5 class="fw-bold text-dark fs-6 mb-1">@cat.Name</h5>
+                            <p class="small text-muted mb-2">@cat.Description</p>
+                            <span class="badge bg-light text-primary border small">@(cat.Count) Listings</span>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Featured Rental Properties -->
+@if (Model.FeaturedProperties != null && Model.FeaturedProperties.Count > 0)
+{
+    <section class="py-5" style="background-color: var(--bg-warm-beige);">
+        <div class="container py-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4">
+                <div>
+                    <span class="badge bg-emerald-light text-emerald border border-emerald-subtle px-3 py-2 rounded-pill fw-semibold mb-2">Handpicked Quality</span>
+                    <h2 class="fw-bold mb-1">Featured Rental Properties</h2>
+                    <p class="text-muted mb-0">Premium homes with verified amenities and stellar ratings</p>
+                </div>
+                <a asp-controller="Properties" asp-action="Index" class="btn btn-outline-primary mt-3 mt-md-0">
+                    View All Homes <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+
+            <div class="row g-4">
+                @foreach (var property in Model.FeaturedProperties)
+                {
+                    <div class="col-lg-4 col-md-6">
+                        @await Html.PartialAsync("_PropertyCard", property)
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+<!-- Popular Locations Section -->
+<section class="py-5" style="background-color: #ffffff;">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-semibold mb-2">Top Destinations</span>
+            <h2 class="fw-bold">Popular Rental Cities</h2>
+            <p class="text-muted">Find prime residential accommodations in vibrant metropolitan areas</p>
+        </div>
+
+        <div class="row g-4">
+            @foreach (var loc in Model.PopularLocations)
+            {
+                <div class="col-lg-3 col-md-6">
+                    <a asp-controller="Properties" asp-action="Index" asp-route-city="@loc.City" class="location-card">
+                        <img src="@loc.ImageUrl" alt="@loc.City" class="location-card-img" />
+                        <div class="location-card-overlay">
+                            <h4 class="fw-bold mb-0">@loc.City</h4>
+                            <div class="small opacity-75">@loc.State &bull; @loc.PropertyCount Homes</div>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Recently Added Properties -->
+@if (Model.RecentProperties != null && Model.RecentProperties.Count > 0)
+{
+    <section class="py-5" style="background-color: var(--bg-secondary);">
+        <div class="container py-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4">
+                <div>
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-semibold mb-2">Fresh on Market</span>
+                    <h2 class="fw-bold mb-1">Recently Listed Properties</h2>
+                    <p class="text-muted mb-0">Brand new rental listings ready for immediate inspection and applications</p>
+                </div>
+                <a asp-controller="Properties" asp-action="Index" class="btn btn-outline-primary mt-3 mt-md-0">
+                    Explore All <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+
+            <div class="row g-4">
+                @foreach (var property in Model.RecentProperties)
+                {
+                    <div class="col-lg-4 col-md-6">
+                        @await Html.PartialAsync("_PropertyCard", property)
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+<!-- How It Works Section -->
+<section id="how-it-works" class="py-5" style="background-color: #ffffff;">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <span class="badge bg-emerald-light text-emerald border border-emerald-subtle px-3 py-2 rounded-pill fw-semibold mb-2">Simple Process</span>
+            <h2 class="fw-bold">How RentHaven Works</h2>
+            <p class="text-muted">A streamlined, transparent three-step process for tenants and landlords</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h5 class="fw-bold mb-2">Search &amp; Filter</h5>
+                    <p class="text-secondary small">
+                        Explore verified listings across prime cities. Use smart filters for rent budget, bedrooms, property types, and specific amenities.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h5 class="fw-bold mb-2">Submit Application Online</h5>
+                    <p class="text-secondary small">
+                        Submit a complete rental application with your income details, move-in schedule, and message directly to the property owner.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h5 class="fw-bold mb-2">Get Approved &amp; Move In</h5>
+                    <p class="text-secondary small">
+                        Track application updates in real-time on your dashboard. Receive landlord approval and arrange lease signing seamlessly.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact-section" class="py-5" style="background-color: var(--bg-warm-beige);">
+    <div class="container py-4">
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-5">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-semibold mb-2">Get In Touch</span>
+                <h2 class="fw-bold mb-3">Have Questions About a Rental Listing?</h2>
+                <p class="text-secondary mb-4">
+                    Our dedicated rental concierge and support team is here to assist prospective tenants and property owners every step of the journey.
+                </p>
+
+                <div class="d-flex align-items-start gap-3 mb-3">
+                    <div class="brand-icon-wrapper flex-shrink-0" style="width: 44px; height: 44px;">
+                        <i class="bi bi-geo-alt"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-dark">Office Location</div>
+                        <div class="small text-secondary">Tech Innovation Center, B.Tech Campus, Dept. of CSE (AIML)</div>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-start gap-3 mb-3">
+                    <div class="brand-icon-wrapper flex-shrink-0" style="width: 44px; height: 44px; background: linear-gradient(135deg, var(--color-emerald), #059669);">
+                        <i class="bi bi-envelope"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-dark">Email Support</div>
+                        <div class="small text-secondary">support@renthaven.com / manan.aiml@college.edu</div>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-start gap-3">
+                    <div class="brand-icon-wrapper flex-shrink-0" style="width: 44px; height: 44px; background: linear-gradient(135deg, #F59E0B, #D97706);">
+                        <i class="bi bi-telephone"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-dark">Direct Phone Line</div>
+                        <div class="small text-secondary">+1 (800) 555-RENT / Mon - Fri (9:00 AM - 6:00 PM)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="bg-white p-4 p-md-5 rounded-4 shadow-sm border border-light">
+                    <h4 class="fw-bold mb-1">Send a Message</h4>
+                    <p class="text-muted small mb-4">Fill out the form below and we will respond right away.</p>
+
+                    <form asp-controller="Home" asp-action="ContactMessage" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Your Name</label>
+                                <input type="text" name="name" class="form-control" placeholder="John Doe" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Your Email</label>
+                                <input type="email" name="email" class="form-control" placeholder="john@example.com" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" name="phone" class="form-control" placeholder="+1 (555) 000-0000" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Subject</label>
+                                <input type="text" name="subject" class="form-control" placeholder="Property Inquiry / Assistance" required />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Message</label>
+                                <textarea name="message" rows="4" class="form-control" placeholder="Tell us how we can help you..." required></textarea>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary px-4 py-2 fw-bold">
+                                    <i class="bi bi-send me-1"></i> Send Inquiry Message
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

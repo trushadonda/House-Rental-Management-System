@@ -1,0 +1,140 @@
+@model List<HouseRentalManagementSystem.Models.ApplicationUser>
+@{
+    ViewData["Title"] = "User Management - Admin";
+    var selectedRole = ViewBag.SelectedRole as string;
+    var searchTerm = ViewBag.SearchTerm as string;
+}
+
+<div class="container py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 small">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none">Home</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none">Admin Console</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">User Management</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold mb-0">Registered User Accounts</h2>
+            <p class="text-muted small mb-0">Browse all system users, manage account active status, and audit user roles</p>
+        </div>
+
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Dashboard Overview
+        </a>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <div class="bg-white p-3 rounded-4 shadow-sm border border-light mb-4">
+        <form asp-action="Users" method="get" class="row g-2 align-items-center">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" value="@searchTerm" class="form-control border-start-0" placeholder="Search by name or email..." />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <select name="roleFilter" class="form-select" onchange="this.form.submit()">
+                    <option value="">All Roles (Admin, Owner, Tenant)</option>
+                    <option value="Admin" selected="@(selectedRole == "Admin")">Administrators</option>
+                    <option value="PropertyOwner" selected="@(selectedRole == "PropertyOwner")">Property Owners</option>
+                    <option value="Tenant" selected="@(selectedRole == "Tenant")">Tenants</option>
+                </select>
+            </div>
+            <div class="col-md-3 text-md-end d-flex gap-2">
+                <button type="submit" class="btn btn-primary btn-sm px-3">Search</button>
+                <a asp-action="Users" class="btn btn-outline-secondary btn-sm">Reset</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Users Table -->
+    @if (Model != null && Model.Count > 0)
+    {
+        <div class="custom-table table-responsive">
+            <table class="table mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>Contact Phone</th>
+                        <th>Address</th>
+                        <th>Registered</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="rounded-circle bg-light text-primary d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px;">
+                                        @(user.FullName.Length > 0 ? user.FullName.Substring(0, 1).ToUpper() : "U")
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark">@user.FullName</div>
+                                        <div class="small text-muted">@user.Email</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge @(user.UserRole == "Admin" ? "bg-dark" : (user.UserRole == "PropertyOwner" ? "bg-primary" : "bg-success"))">
+                                    @user.UserRole
+                                </span>
+                            </td>
+                            <td>
+                                <span class="small text-secondary">@(string.IsNullOrEmpty(user.PhoneNumber) ? "—" : user.PhoneNumber)</span>
+                            </td>
+                            <td>
+                                <span class="small text-muted text-truncate d-inline-block" style="max-width: 180px;">
+                                    @(string.IsNullOrEmpty(user.Address) ? "—" : user.Address)
+                                </span>
+                            </td>
+                            <td>
+                                <span class="small text-muted">@user.CreatedAt.ToString("MMM dd, yyyy")</span>
+                            </td>
+                            <td>
+                                @if (user.IsActive)
+                                {
+                                    <span class="badge bg-emerald-light text-emerald border border-emerald-subtle">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger-subtle text-danger">Deactivated</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <form asp-action="ToggleUserStatus" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="userId" value="@user.Id" />
+                                    @if (user.IsActive)
+                                    {
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Deactivate User">
+                                            <i class="bi bi-person-x me-1"></i> Deactivate
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button type="submit" class="btn btn-sm btn-outline-success" title="Activate User">
+                                            <i class="bi bi-person-check me-1"></i> Activate
+                                        </button>
+                                    }
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="bg-white p-5 rounded-4 shadow-sm border text-center my-4">
+            <h4 class="fw-bold text-dark">No Users Found</h4>
+            <p class="text-secondary small mb-0">No accounts match the search criteria.</p>
+        </div>
+    }
+</div>
+

@@ -1,0 +1,110 @@
+@model HouseRentalManagementSystem.ViewModels.Application.RentalApplicationCreateViewModel
+@{
+    ViewData["Title"] = "Apply for Rental Property";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h2 class="fw-bold mb-1">Submit Rental Application</h2>
+                    <p class="text-secondary small mb-0">Provide your applicant details directly to the property landlord</p>
+                </div>
+                <a asp-controller="Properties" asp-action="Details" asp-route-id="@Model.PropertyId" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Property
+                </a>
+            </div>
+
+            <!-- Property Preview Card -->
+            <div class="bg-white p-3 rounded-4 shadow-sm border border-light mb-4 d-flex align-items-center gap-3">
+                <img src="@Model.PropertyImageUrl" alt="@Model.PropertyTitle" class="rounded-3 object-fit-cover border" style="width: 100px; height: 75px;" 
+                     onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1000&q=80';" />
+                <div class="flex-grow-1">
+                    <h5 class="fw-bold text-dark mb-1">@Model.PropertyTitle</h5>
+                    <div class="text-muted small"><i class="bi bi-geo-alt text-primary"></i> @Model.PropertyAddress</div>
+                    <div class="d-flex gap-3 mt-1 small">
+                        <span><strong>Rent:</strong> $@Model.MonthlyRent.ToString("N0")/mo</span>
+                        <span><strong>Deposit:</strong> $@Model.SecurityDeposit.ToString("N0")</span>
+                        <span><strong>Owner:</strong> @Model.OwnerName</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Application Form -->
+            <div class="bg-white p-4 p-md-5 rounded-4 shadow-sm border border-light">
+                <form asp-action="Apply" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="PropertyId" />
+                    <input type="hidden" asp-for="PropertyTitle" />
+                    <input type="hidden" asp-for="PropertyAddress" />
+                    <input type="hidden" asp-for="PropertyCity" />
+                    <input type="hidden" asp-for="MonthlyRent" />
+                    <input type="hidden" asp-for="SecurityDeposit" />
+                    <input type="hidden" asp-for="PropertyImageUrl" />
+                    <input type="hidden" asp-for="OwnerName" />
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+                    <h5 class="fw-bold text-primary mb-3 pb-2 border-bottom">Applicant Financial &amp; Occupancy Details</h5>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label asp-for="MonthlyIncome" class="form-label"></label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input asp-for="MonthlyIncome" class="form-control" placeholder="e.g. 6500" step="100" />
+                            </div>
+                            <small class="text-muted">Net verifiable monthly take-home income</small>
+                            <span asp-validation-for="MonthlyIncome" class="text-danger small d-block"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="Occupation" class="form-label"></label>
+                            <input asp-for="Occupation" class="form-control" placeholder="e.g. Senior Software Engineer at Tech Corp" />
+                            <small class="text-muted">Current job designation / employer</small>
+                            <span asp-validation-for="Occupation" class="text-danger small d-block"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="NumberOfOccupants" class="form-label"></label>
+                            <input asp-for="NumberOfOccupants" type="number" class="form-control" min="1" max="10" />
+                            <small class="text-muted">Total number of people who will reside in the house</small>
+                            <span asp-validation-for="NumberOfOccupants" class="text-danger small d-block"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="ProposedMoveInDate" class="form-label"></label>
+                            <input asp-for="ProposedMoveInDate" type="date" class="form-control" />
+                            <small class="text-muted">Preferred lease commencement date</small>
+                            <span asp-validation-for="ProposedMoveInDate" class="text-danger small d-block"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="Message" class="form-label"></label>
+                            <textarea asp-for="Message" rows="4" class="form-control" placeholder="Introduce yourself, your pets (if any), reason for moving, or special requests for the landlord..."></textarea>
+                            <span asp-validation-for="Message" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 mb-4 small text-secondary">
+                        <i class="bi bi-shield-lock-fill text-success me-1"></i>
+                        By submitting this application, you authorize the property owner to review your stated credentials. There are no application submission fees.
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-controller="Properties" asp-action="Details" asp-route-id="@Model.PropertyId" class="btn btn-secondary-soft px-4 py-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-5 py-2 fw-bold">
+                            <i class="bi bi-send-check me-1"></i> Submit Application
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
